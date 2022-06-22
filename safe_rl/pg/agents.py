@@ -244,7 +244,7 @@ class CPOAgent(TrustRegionAgent):
         old_params = self.sess.run(get_pi_params)
         c = self.logger.get_stats('EpCost')[0] - cost_lim
         rescale = self.logger.get_stats('EpLen')[0]
-
+        print("Epcost", self.logger.get_stats('EpCost')[0], "EpLen", self.logger.get_stats('EpLen')[0])
         # Consider the right margin
         if self.learn_margin:
             self.margin += self.margin_lr * c
