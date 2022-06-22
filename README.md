@@ -23,6 +23,8 @@ git clone https://github.com/openai/safety-starter-agents.git
 
 cd safety-starter-agents
 
+sudo apt install libopenmpi-dev
+
 pip install -e .
 ```
 
@@ -44,6 +46,10 @@ ppo_lagrangian(
 
 ```
 
+
+```
+python experiment.py --algo cpo --task goal1 --robot point --seed 0  
+```
 
 **Reproduce Experiments from Paper:** To reproduce an experiment from the paper, run:
 
