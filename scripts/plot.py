@@ -15,7 +15,7 @@ units = dict()
 def plot_data(data, xaxis='Epoch', value="AverageEpRet", 
               condition="Condition1", smooth=1, paper=False,
               hidelegend=False, title=None, savedir=None, 
-              clear_xticks=False, **kwargs):
+              clear_xticks=False, fmt="png", **kwargs):
     # special handling for plotting a horizontal line
     splits = value.split(',')
     value = splits[0]
@@ -119,7 +119,7 @@ def plot_data(data, xaxis='Epoch', value="AverageEpRet",
         # y, xmin, xmax, colors='k', linestyles='solid', label='',
         plt.hlines(y_horiz, 0, xmax, colors='red', linestyles='dashed', label='limit')
 
-    fname = osp.join(savedir, title+'_'+value).lower()
+    fname = osp.join(savedir, title+'_'+value)
 
     if clear_xticks:
         x, _ = plt.xticks()
@@ -129,13 +129,13 @@ def plot_data(data, xaxis='Epoch', value="AverageEpRet",
 
     if savedir is not '':
         os.makedirs(savedir, exist_ok=True)
-        plt.savefig(fname+'.pdf', format='pdf')
+        plt.savefig(fname+'.{}'.format(fmt), format=fmt)
 
     if hidelegend:
         plt.legend().remove()
 
         if savedir is not '':
-            plt.savefig(fname + '_nolegend.pdf', format='pdf')
+            plt.savefig(fname + '_nolegend.{}'.format(fmt), format=fmt)
 
     if savedir is not '':
         # Separately save legend
@@ -149,7 +149,7 @@ def plot_data(data, xaxis='Epoch', value="AverageEpRet",
         for line in leg.get_lines():
             line.set_linewidth(4.0)
         plt.tight_layout(pad=0.5)
-        plt.savefig(osp.join(savedir, title+'_legend.pdf'), format='pdf')
+        plt.savefig(osp.join(savedir, title+'_legend.{}'.format(fmt)), format=fmt)
 
 
 def get_datasets(logdir, condition=None):
@@ -253,7 +253,17 @@ def make_plots(all_logdirs, legend=None, xaxis=None, values=None, count=False,
     values = values if isinstance(values, list) else [values]
     condition = 'Condition2' if count else 'Condition1'
     estimator = getattr(np, estimator)      # choose what to show on main curve: mean? max? min?
+
+    print(savedir)
+    if savedir == '':
+        savedir = osp.join(all_logdirs[0], "fig")
+        os.makedirs(savedir, exist_ok=True)
+        print("--?", savedir)
+    
+
     for value in values:
+        if title == '':
+            title = value
         plt.figure()
         plot_data(data, xaxis=xaxis, value=value, condition=condition, 
                   smooth=smooth, estimator=estimator,
@@ -267,10 +277,10 @@ def make_plots(all_logdirs, legend=None, xaxis=None, values=None, count=False,
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('logdir', nargs='*')
+    parser.add_argument('logdir', nargs='*', default='./')
     parser.add_argument('--legend', '-l', nargs='*')
     parser.add_argument('--xaxis', '-x', default='TotalEnvInteracts')
-    parser.add_argument('--value', '-y', default='Performance', nargs='*')
+    parser.add_argument('--value', '-y', default=['AverageEpRet', "AverageEpCost"], nargs='*')
     parser.add_argument('--count', action='store_true')
     parser.add_argument('--smooth', '-s', type=int, default=1)
     parser.add_argument('--select', nargs='*')
